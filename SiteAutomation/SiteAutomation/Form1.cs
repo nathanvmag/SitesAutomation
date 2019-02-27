@@ -24,23 +24,34 @@ namespace SiteAutomation
         public Form1()
         {
             InitializeComponent();
-            /*sitename.Text = "https://www.dicadecursosudemy.online/wp-admin/";
+            sitename.Text = "https://www.dicadecursosudemy.online/wp-admin/";
             username.Text = "systemads@tutanota.com";
             wordpass.Text = "tech123";
             blogcat1.Text = "Cancer";
-            blogcat2.Text = "Brain Cancer";*/
+            blogcat2.Text = "Brain Cancer";        
             
-            
-
-        }
+            }
 
         private async void button1_ClickAsync(object sender, EventArgs e)
         {
             ChromeOptions op = new ChromeOptions();
             op.AddArgument("--start-maximized");
             IWebDriver wordpress = new ChromeDriver("./",op);
-            IWebDriver translate = new ChromeDriver("./", op);
-            translate.Navigate().GoToUrl("https://translate.google.com");
+            IWebDriver translate= null;
+            if (tradu.Checked)
+            {
+
+                translate = new ChromeDriver("./", op);
+                translate.Navigate().GoToUrl("https://translate.google.com/#view=home&op=translate&sl=auto&tl=en");
+                await Task.Delay(5000);
+                
+                IJavaScriptExecutor js = (IJavaScriptExecutor)translate;
+                    var a = "https://translate.google.com/#view=home&op=translate&sl=auto&tl="+(string.IsNullOrEmpty(sigla.Text) ? "pt" : sigla.Text);
+                js.ExecuteScript("location.href='"+a+"' " );
+/*
+                string g = await traduzir2Async(translate, "Hello World");
+                Console.WriteLine(g);*/
+            }
             if (!string.IsNullOrEmpty(username.Text)&&!string.IsNullOrEmpty(sitename.Text)&&!string.IsNullOrEmpty(wordpass.Text))
                         {
                             try
@@ -161,8 +172,12 @@ namespace SiteAutomation
                                                         {
                                                             foreach (string s in texto)
                                                         {
-                                                            string tradu = await traduzir2Async(translate,s);
-                                                            traduzidas.Add(tradu);
+                                                                if (tradu.Checked && translate != null)
+                                                                {
+                                                                    string tradu = await traduzir2Async(translate, s);
+                                                                    traduzidas.Add(tradu);
+                                                                }
+                                                                else traduzidas.Add(s);
                                                         };
                                                         }
                                                         catch (traduzirExeceptiob tx)
@@ -240,7 +255,7 @@ namespace SiteAutomation
                     }
                     try
                     {
-                        if (driver != null) driver.Close();
+                        if (driver != null) driver.Quit();
                         
                     }
                     catch
@@ -256,8 +271,8 @@ namespace SiteAutomation
             else MessageBox.Show("Você não está logado no sistema do WORDPRESS", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             try
             {
-                if (wordpress != null) wordpress.Close();
-                if (translate != null) translate.Close();
+                if (wordpress != null) wordpress.Quit();
+                if (translate != null) translate.Quit();
             }
             catch
             {
@@ -265,28 +280,7 @@ namespace SiteAutomation
             }
 
         }
-        public string traduzirAsync(string tx)
-        {
-            try
-            {
-                WebClient wb = new WebClient();               
-                
-                wb.Encoding = Encoding.UTF8;
-                var reqparm = new System.Collections.Specialized.NameValueCollection();
-                reqparm.Add("q", tx);
-                reqparm.Add("target", "pt-br");
-                reqparm.Add("key", "AIzaSyAyV-qb64aCQfr9wfSDENsIewCM9PBFjZ8");
-                byte[] responsebytes =  wb.UploadValues("https://translation.googleapis.com/language/translate/v2", "POST", reqparm);
-                string responsebody = Encoding.UTF8.GetString(responsebytes);
-                JObject o = JObject.Parse(responsebody);
-               return ""+ o["data"]["translations"][0]["translatedText"];
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw new traduzirExeceptiob();
-            }
-        }
+        
         public async Task<string> traduzir2Async(IWebDriver translate,string tx)
         {
             try
@@ -297,15 +291,16 @@ namespace SiteAutomation
                 translate.FindElement(By.Id("source")).SendKeys(tx);
                 translate.FindElement(By.Id("source")).SendKeys(OpenQA.Selenium.Keys.Enter);
                 await Task.Delay(4000);
-                var tradu = translate.FindElement(By.Id("result_box")).Text;
-                if(string.IsNullOrEmpty(tradu)) throw new traduzirExeceptiob();
+                var tradu = translate.FindElement(By.ClassName("translation")).Text; // translate.FindElement(By.XPath(" / html/body/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/div[1]/div[2]/div/span[1]")).Text;
+                if (string.IsNullOrEmpty(tradu)) throw new traduzirExeceptiob();
 
                 //Console.WriteLine(tradu);
                 return tradu;
             }
-            catch
+
+            catch (Exception ex )
             {
-                throw new traduzirExeceptiob();
+                throw ex;
             }
         }
 

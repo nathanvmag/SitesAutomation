@@ -51,6 +51,9 @@
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.label13 = new System.Windows.Forms.Label();
+            this.tradu = new System.Windows.Forms.CheckBox();
+            this.sigla = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.SuspendLayout();
@@ -125,7 +128,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(151, 526);
+            this.button1.Location = new System.Drawing.Point(151, 545);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 18;
@@ -257,18 +260,51 @@
             // 
             // label13
             // 
-            this.label13.Location = new System.Drawing.Point(38, 477);
+            this.label13.Location = new System.Drawing.Point(38, 496);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(317, 46);
             this.label13.TabIndex = 34;
             this.label13.Text = "Status : Aguardando Início";
             this.label13.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // tradu
+            // 
+            this.tradu.AutoSize = true;
+            this.tradu.Checked = true;
+            this.tradu.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tradu.Location = new System.Drawing.Point(41, 472);
+            this.tradu.Name = "tradu";
+            this.tradu.Size = new System.Drawing.Size(83, 21);
+            this.tradu.TabIndex = 35;
+            this.tradu.Text = "Traduzir";
+            this.tradu.UseVisualStyleBackColor = true;
+            // 
+            // sigla
+            // 
+            this.sigla.Location = new System.Drawing.Point(241, 472);
+            this.sigla.MaxLength = 2;
+            this.sigla.Name = "sigla";
+            this.sigla.Size = new System.Drawing.Size(113, 22);
+            this.sigla.TabIndex = 36;
+            this.sigla.Text = "pt";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(197, 474);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(43, 17);
+            this.label9.TabIndex = 37;
+            this.label9.Text = "Sigla:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(395, 558);
+            this.ClientSize = new System.Drawing.Size(395, 580);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.sigla);
+            this.Controls.Add(this.tradu);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.numericUpDown2);
             this.Controls.Add(this.numericUpDown1);
@@ -322,6 +358,9 @@
         private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.CheckBox tradu;
+        private System.Windows.Forms.TextBox sigla;
+        private System.Windows.Forms.Label label9;
     }
 }
 

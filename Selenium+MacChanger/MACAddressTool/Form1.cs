@@ -15,6 +15,7 @@ using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
+using System.IO;
 
 namespace MACAddressTool
 {
@@ -112,7 +113,8 @@ namespace MACAddressTool
             /// <summary>
             /// Get the NetworkAddress registry value of this adapter.
             /// </summary>
-            public string RegistryMac {
+            public string RegistryMac
+            {
                 get
                 {
                     try
@@ -156,14 +158,14 @@ namespace MACAddressTool
                             throw new Exception("Adapter not found in registry");
 
                         // Ask if we really want to do this
-                       /* string question = value.Length > 0 ?
-                            "Changing MAC-adress of adapter {0} from {1} to {2}. Proceed?" :
-                            "Clearing custom MAC-address of adapter {0}. Proceed?";
-                        DialogResult proceed = MessageBox.Show(
-                            String.Format(question, this.ToString(), this.Mac, value),
-                            "Change MAC-address?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                        if (proceed != DialogResult.Yes)
-                            return false;*/
+                        /* string question = value.Length > 0 ?
+                             "Changing MAC-adress of adapter {0} from {1} to {2}. Proceed?" :
+                             "Clearing custom MAC-address of adapter {0}. Proceed?";
+                         DialogResult proceed = MessageBox.Show(
+                             String.Format(question, this.ToString(), this.Mac, value),
+                             "Change MAC-address?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                         if (proceed != DialogResult.Yes)
+                             return false;*/
 
                         // Attempt to disable the adepter
                         var result = (uint)adapter.InvokeMethod("Disable", null);
@@ -178,7 +180,7 @@ namespace MACAddressTool
                             regkey.SetValue("NetworkAddress", value, RegistryValueKind.String);
                         else
                             regkey.DeleteValue("NetworkAddress");
-                        
+
 
                         return true;
                     }
@@ -278,9 +280,9 @@ namespace MACAddressTool
         public Form1()
         {
             InitializeComponent();
-            userlabel.Text = "eli-lsp-90@outlook.com";
+            /*userlabel.Text = "eli-lsp-90@outlook.com";
             passlabel.Text = "xkzj4k32321";
-           /* userlabel.Text = "nathanvmag@gmail.com";
+            userlabel.Text = "nathanvmag@gmail.com";
             passlabel.Text = "24841976";*/
         }
 
@@ -295,7 +297,7 @@ namespace MACAddressTool
             {
                 AdaptersComboBox.Items.Add(new Adapter(adapter));
             }
-            
+
             AdaptersComboBox.SelectedIndex = 0;
         }
 
@@ -316,7 +318,7 @@ namespace MACAddressTool
 
         private void RandomButton_Click(object sender, EventArgs e)
         {
-            newMacadd= Adapter.GetNewMac();
+            newMacadd = Adapter.GetNewMac();
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
@@ -367,7 +369,7 @@ namespace MACAddressTool
             {
                 DialogResult dr = MessageBox.Show("Você tem certeza que selecionou a conexão correta ? Caso não tenha a troca do mac adress irá falhar"
                     , "Duvida", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if(dr==DialogResult.Yes)
+                if (dr == DialogResult.Yes)
                 {
                     statuslabel.Text = "Status: Trocando Mac address";
                     UpdateButton_Click(sender, e);
@@ -380,7 +382,8 @@ namespace MACAddressTool
             }
             else MessageBox.Show("Por favor preencha todos os campos", "Error", MessageBoxButtons.OK);
         }
-        async void automateAsync(string login,string pass)
+        async         Task
+automateAsync(string login, string pass)
         {
             ChromeOptions op = new ChromeOptions();
             op.AddArgument("--start-maximized");
@@ -388,21 +391,141 @@ namespace MACAddressTool
             IWebDriver driver = new ChromeDriver("./", op);
             statuslabel.Text = "Status: Logando no Adsense";
 
-            driver.Navigate().GoToUrl("https://www.google.com/intl/pt-BR_br/adsense/start/#/?modal_active=none");
-            await Task.Delay(1000);
-            driver.FindElement(By.XPath("/html/body/header/nav/div/a[1]")).Click();
-            await Task.Delay(1500);
-            driver.FindElement(By.Id("identifierId")).SendKeys(login);
-            driver.FindElement(By.Id("identifierId")).SendKeys(OpenQA.Selenium.Keys.Enter);
-            await Task.Delay(1500);
-            driver.FindElement(By.XPath("//*[@id='password']/div[1]/div/div[1]/input")).SendKeys(pass);
-            driver.FindElement(By.XPath("//*[@id='password']/div[1]/div/div[1]/input")).SendKeys(OpenQA.Selenium.Keys.Enter);
-            
-            await Task.Delay(5000);
+            try
+
+            {
+                driver.Navigate().GoToUrl("https://www.google.com/intl/pt-BR_br/adsense/start/#/?modal_active=none");
+                await Task.Delay(1000);
+                driver.FindElement(By.XPath("/html/body/header/nav/div/a[1]")).Click();
+                await Task.Delay(1500);
+                driver.FindElement(By.Id("identifierId")).SendKeys(login);
+                driver.FindElement(By.Id("identifierId")).SendKeys(OpenQA.Selenium.Keys.Enter);
+                await Task.Delay(5000);
+                driver.FindElement(By.XPath("//*[@id='password']/div[1]/div/div[1]/input")).SendKeys(pass);
+                driver.FindElement(By.XPath("//*[@id='password']/div[1]/div/div[1]/input")).SendKeys(OpenQA.Selenium.Keys.Enter);
+                await Task.Delay(5000);
+
+                driver.FindElement(By.Id("bruschetta_container")).GetAttribute("innerHTML");
+                //driver.FindElement(By.XPath("//*[@id='as-menu-toggle']/div/material-icon/i")).Click();
+                //await Task.Delay(300);
+                //driver.FindElement(By.XPath("//*[@id='my-sites-section-header']/div/div")).Click();
+                driver.Navigate().GoToUrl(driver.Url.Replace("home", "sites/my-sites"));
+                statuslabel.Text = "Status: Obtendo informações";
+                await Task.Delay(5000);
+                bool work = true;
+                int indx = 1;
+                string resultpath = "./resultados/" + DateTime.Now.ToString("dd.MM.yyyy") + "/";
+                if (!Directory.Exists(resultpath)) Directory.CreateDirectory(resultpath);
+                StreamWriter writer = new StreamWriter(resultpath + login + ".txt");
+                string finaltx = "Exibindo sites da conta " + login + Environment.NewLine;
+                while (work)
+                {
+                    try
+                    {
+                        statuslabel.Text = "Status: Lendo site"+indx;
+
+                        string site =
+                            driver.FindElement(
+                                By.XPath("//*[@id='sitemanagement_container']/my-sites/as-exception-handler/manage-sites-brita/overview/sites-list-brita/div/div[1]/div/material-expansionpanel-set/url-tree-brita[" + indx + "]/material-expansionpanel/div/header/div/div[1]/div/span"))
+                                .Text;
+                        string status = driver.FindElement(
+                                By.XPath("//*[@id='sitemanagement_container']/my-sites/as-exception-handler/manage-sites-brita/overview/sites-list-brita/div/div[1]/div/material-expansionpanel-set/url-tree-brita[" + indx + "]/material-expansionpanel/div/header/div/div[2]/div/div"))
+                                .Text.Replace("info_outline", "");
+                        Console.WriteLine("O site " + site + " Esta em " + status);
+                        finaltx += "O site " + site + " está em " + status + Environment.NewLine;
+                        indx++;
+                    }
+                    catch (NoSuchElementException no)
+                    {
+                        Console.WriteLine("Acabou para este login");
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        finaltx += "Falha ao obter status " + e + Environment.NewLine;
+                        Console.WriteLine(e.ToString());
+                        break;
+                    }
+                }
+                writer.Write(finaltx);
+                writer.Close();
+                driver.Quit();
+
+            }
+            catch (Exception e)
+            {
+                string resultpath = "./resultados/" + DateTime.Now.ToString("dd.MM.yyyy") + "/";
+                if (!Directory.Exists(resultpath)) Directory.CreateDirectory(resultpath);
+                StreamWriter writer = new StreamWriter(resultpath + login + ".txt");
+                Console.WriteLine("Falha ao logar no adsense " + e.ToString());
+                writer.Write("Falha ao logar no servidor do adsense "+Environment.NewLine+" "+e.ToString());
+                writer.Close();
+                driver.Quit();
 
 
+                //  MessageBox.Show("Falha ao logar no adsense tente novamente depois", "Error", MessageBoxButtons.OK);
+            }
+
+
+
+            statuslabel.Text = "Status: Tarefa finalizada";
 
         }
 
+        private async void button2_ClickAsync(object sender, EventArgs e)
+        {
+            DialogResult dr = MessageBox.Show("Você tem certeza que selecionou a conexão correta ? Caso não tenha a troca do mac adress irá falhar"
+                       , "Duvida", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dr == DialogResult.Yes)
+            {
+                List<conta> contas = new List<conta>();
+                if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    Console.WriteLine(openFileDialog1.FileName);
+                    StreamReader sr = new StreamReader(openFileDialog1.FileName);
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        try
+                        {
+                            string[] splited = line.Split(' ');
+                            contas.Add(new conta(splited[0], splited[1]));
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    sr.Close();
+                    Console.WriteLine("automatizar " + contas.Count);
+                    statuslabel.Text = "Status: Iniciando automatização de " + contas.Count + " contas";
+                    foreach (conta c in contas)
+                    {
+                        userlabel.Text = c.user;
+                        passlabel.Text = c.pass;
+                        statuslabel.Text = "Status: Trocando Mac address";
+                        UpdateButton_Click(sender, e);
+                        statuslabel.Text = "Status: Aguardando 1 minutos para configurar Mac Address";
+                        await Task.Delay(60000);
+                        await automateAsync(c.user, c.pass);
+                        statuslabel.Text = "Status: Fim de uma automação";
+
+
+                    }
+                    statuslabel.Text = "Status: Fim da tarefa em lotes";
+
+                }
+            }
+        }
+    }
+    class conta
+    {
+        public string user, pass;
+        public conta(string u, string p)
+        {
+            user = u;
+            pass = p;
+        }
     }
 }
+
