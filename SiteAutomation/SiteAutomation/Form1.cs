@@ -21,6 +21,7 @@ namespace SiteAutomation
         bool logadowordpress = false;
         int sucessos, falhas;
         string status = "Aguardando Ínicio";
+        string wordpresslogin;
         public Form1()
         {
             InitializeComponent();
@@ -63,6 +64,8 @@ namespace SiteAutomation
                                 wordpress.FindElement(By.Id("user_pass")).SendKeys(wordpass.Text);                    
                                 wordpress.FindElement(By.Id("wp-submit")).Click();
                                 await Task.Delay(2000);
+                                wordpresslogin = wordpress.Url;
+
                                 wordpress.FindElement(By.XPath("//*[@id='menu-posts']/a/div[3]")).Click();
                                 await Task.Delay(1000);
                                 wordpress.FindElement(By.XPath("//*[@id='menu-posts']/ul/li[3]/a")).Click();
@@ -128,6 +131,7 @@ namespace SiteAutomation
                                                 {
                                                     urls.Add(driver.Url + "&page=" + i);
                                                 }
+                                                Console.WriteLine("urls " + urls.Count());
                                                 int pageind = (int)numericUpDown1.Value;
        
                                                 foreach (string nowurl in urls) {
@@ -143,6 +147,7 @@ namespace SiteAutomation
 
                                                     }
                                                     var post = driver.FindElements(By.ClassName("article-title-link"));
+                                                    
                                                     for (int z = 0; z < post.Count(); z++)
                                                     {
                                                         var post2 = driver.FindElements(By.ClassName("article-title-link"));
@@ -193,10 +198,32 @@ namespace SiteAutomation
                                                             Console.WriteLine(s);
                                                         };
                                                             status = "Efetuando Post no Wordpress " + z + "/" + post.Count + Environment.NewLine + " Página " + pageind + "/" + numericUpDown2.Value;
-                                                            wordpress.FindElement(By.XPath("//*[@id='menu-posts']/a/div[3]")).Click();
-                                                            await Task.Delay(1000);
-                                                            wordpress.FindElement(By.XPath("//*[@id='menu-posts']/ul/li[3]/a")).Click();
-                                                            wordpress.FindElement(By.Id("title")).SendKeys(traduzidas[0]);
+                                                        /* try
+                                                         {
+
+                                                             wordpress.FindElement(By.XPath("//*[@id='menu-posts']/a/div[3]")).Click();
+                                                             await Task.Delay(2000);
+                                                         }
+                                                         catch
+                                                         {
+                                                         try
+                                                         {
+                                                             wordpress.FindElement(By.XPath("//*[@id='menu-posts']/a/div[3]")).Click();
+                                                             await Task.Delay(2000);
+                                                             wordpress.FindElement(By.XPath("//*[@id='menu-posts']/ul/li[3]/a")).Click();
+                                                         }
+                                                         catch
+                                                         {
+                                                             wordpress.Navigate().GoToUrl(wordpresslogin+ "post-new.php");
+                                                             await Task.Delay(2000);
+                                                         }                                                            driver.Navigate().GoToUrl(wordpresslogin+ "post-new.php");
+
+                                                         }*/
+                                                        wordpress.Navigate().GoToUrl(wordpresslogin + "post-new.php");
+                                                        await Task.Delay(2000);
+
+
+                                                        wordpress.FindElement(By.Id("title")).SendKeys(traduzidas[0]);
                                                             wordpress.FindElement(By.Id("title")).SendKeys(OpenQA.Selenium.Keys.Tab);
 
                                                             await Task.Delay(500);

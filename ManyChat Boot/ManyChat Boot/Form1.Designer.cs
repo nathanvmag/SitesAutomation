@@ -38,7 +38,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.paginas = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.RichTextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.agendadobox = new System.Windows.Forms.CheckBox();
@@ -47,10 +47,12 @@
             this.statuslabel = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.buttontext = new System.Windows.Forms.TextBox();
+            this.buttontext = new System.Windows.Forms.RichTextBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.btlink = new System.Windows.Forms.TextBox();
+            this.btlink = new System.Windows.Forms.RichTextBox();
             this.usabt = new System.Windows.Forms.CheckBox();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // loginbox
@@ -107,6 +109,7 @@
             // 
             // paginas
             // 
+            this.paginas.AutoScroll = true;
             this.paginas.BackColor = System.Drawing.SystemColors.ControlLight;
             this.paginas.Location = new System.Drawing.Point(31, 199);
             this.paginas.Name = "paginas";
@@ -125,24 +128,24 @@
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(495, 64);
-            this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(244, 197);
             this.textBox1.TabIndex = 7;
+            this.textBox1.Text = "";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(545, 44);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(148, 17);
+            this.label4.Size = new System.Drawing.Size(153, 17);
             this.label4.TabIndex = 8;
-            this.label4.Text = "Texto para Broadcast:";
+            this.label4.Text = "Texto para Mensagem:";
             // 
             // button3
             // 
             this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(557, 294);
+            this.button3.Location = new System.Drawing.Point(495, 307);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(116, 45);
             this.button3.TabIndex = 9;
@@ -153,7 +156,7 @@
             // agendadobox
             // 
             this.agendadobox.AutoSize = true;
-            this.agendadobox.Location = new System.Drawing.Point(495, 352);
+            this.agendadobox.Location = new System.Drawing.Point(495, 366);
             this.agendadobox.Name = "agendadobox";
             this.agendadobox.Size = new System.Drawing.Size(139, 21);
             this.agendadobox.TabIndex = 10;
@@ -166,7 +169,7 @@
             this.dateTimePicker1.CustomFormat = "dd/MM/yyyy HH:mm";
             this.dateTimePicker1.Enabled = false;
             this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker1.Location = new System.Drawing.Point(495, 380);
+            this.dateTimePicker1.Location = new System.Drawing.Point(495, 394);
             this.dateTimePicker1.Name = "dateTimePicker1";
             this.dateTimePicker1.Size = new System.Drawing.Size(200, 22);
             this.dateTimePicker1.TabIndex = 11;
@@ -187,12 +190,12 @@
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(495, 268);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(228, 17);
+            this.label5.Size = new System.Drawing.Size(228, 36);
             this.label5.TabIndex = 13;
-            this.label5.Text = "Use [nome] para função FirstName";
+            this.label5.Text = "Use [nome] para função FirstName use <br> para pular linha";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // label6
             // 
@@ -206,10 +209,10 @@
             // buttontext
             // 
             this.buttontext.Location = new System.Drawing.Point(755, 64);
-            this.buttontext.Multiline = true;
             this.buttontext.Name = "buttontext";
             this.buttontext.Size = new System.Drawing.Size(244, 41);
             this.buttontext.TabIndex = 14;
+            this.buttontext.Text = "";
             // 
             // label7
             // 
@@ -226,6 +229,7 @@
             this.btlink.Name = "btlink";
             this.btlink.Size = new System.Drawing.Size(244, 22);
             this.btlink.TabIndex = 16;
+            this.btlink.Text = "";
             // 
             // usabt
             // 
@@ -237,11 +241,35 @@
             this.usabt.Text = "Utilizar botão";
             this.usabt.UseVisualStyleBackColor = true;
             // 
+            // button4
+            // 
+            this.button4.Enabled = false;
+            this.button4.Location = new System.Drawing.Point(617, 307);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(116, 45);
+            this.button4.TabIndex = 19;
+            this.button4.Text = "Default Reply";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_ClickAsync);
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(93, 402);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(155, 23);
+            this.button5.TabIndex = 20;
+            this.button5.Text = "Selecionar Todos";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1011, 450);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.usabt);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.btlink);
@@ -280,7 +308,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel paginas;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.RichTextBox textBox1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.CheckBox agendadobox;
@@ -289,10 +317,12 @@
         private System.Windows.Forms.Label statuslabel;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox buttontext;
+        private System.Windows.Forms.RichTextBox buttontext;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox btlink;
+        private System.Windows.Forms.RichTextBox btlink;
         private System.Windows.Forms.CheckBox usabt;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
     }
 }
 

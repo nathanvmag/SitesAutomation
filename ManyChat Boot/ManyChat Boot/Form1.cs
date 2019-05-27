@@ -21,8 +21,8 @@ namespace ManyChat_Boot
         public Form1()
         {
             InitializeComponent();
-            loginbox.Text = "facesperfiledd3@mariela1121.club";
-            senhabox.Text = "lima1234";
+            loginbox.Text = Properties.Settings.Default.login;
+            senhabox.Text = Properties.Settings.Default.senha;
             dateTimePicker1.Value = DateTime.Now;
             status = "Aguardando início";
             
@@ -44,11 +44,22 @@ namespace ManyChat_Boot
             op.AddArgument("--disable-notifications");
             op.AddArgument("--start-maximized");
 
-            driver = new ChromeDriver("./", op);
+            try
+            {
+                driver = new ChromeDriver("./", op);
+            }
+            catch
+            {
+                errobox("Falha ao abrir automatizador, por favor feche todas as instancias abertas");
+                return;
+            }
             status = "Abrindo Chrome";
 
             string login = loginbox.Text;
             string pass = senhabox.Text;
+            Properties.Settings.Default.login = login;
+            Properties.Settings.Default.senha = pass;
+            Properties.Settings.Default.Save();
             driver.Navigate().GoToUrl("https://manychat.com/login");
             try
             {
@@ -74,6 +85,7 @@ namespace ManyChat_Boot
                     errobox("Senha incorreta ou problema no login, resolva manualmente");
                     return;
                 }
+               
                 driver.FindElements(By.ClassName("_43rm"))[1].Click();
                 await Task.Delay(1000);
                 driver.FindElement(By.Id("allAssetsInput")).Click();
@@ -96,7 +108,7 @@ namespace ManyChat_Boot
                 errobox("Falha ao logar no ManyChat, por favor proceda manualmente");
                 return;
             }
-            await Task.Delay(1500);
+            await Task.Delay(8000);
 
             var linhas = driver.FindElement(By.TagName("tbody")).FindElements(By.TagName("tr"));
             if (linhas.Count == 0)
@@ -131,6 +143,8 @@ namespace ManyChat_Boot
             BeginInvoke(new Action(() =>
             {
                 button3.Enabled = linhas.Count > 0 ? true : false;
+                button4.Enabled = linhas.Count > 0 ? true : false;
+
             }));
 
         }
@@ -146,16 +160,22 @@ namespace ManyChat_Boot
             {
                 //Directory.Delete("perfisChrome", true);
                 System.IO.DirectoryInfo di = new DirectoryInfo("perfisChrome");
-
-                foreach (FileInfo file in di.GetFiles())
+                try
                 {
-                    file.Delete();
+                    foreach (FileInfo file in di.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (DirectoryInfo dir in di.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+                    MessageBox.Show("Sucesso ao remover", "Sucesso");
                 }
-                foreach (DirectoryInfo dir in di.GetDirectories())
+                catch
                 {
-                    dir.Delete(true);
+                    errobox("Falha ao remover arquivos do chrome, por favor remova a pasta perfisChrome manualmente");
                 }
-                MessageBox.Show("Sucesso ao remover", "Sucesso");
             }
 
         }
@@ -163,12 +183,12 @@ namespace ManyChat_Boot
         private async void button3_ClickAsync(object sender, EventArgs e)
         {
             status = "Iniciando Broadcasting";
-            button3.Enabled = false;
+             button3.Enabled = false; button4.Enabled= false;
             int sucess = 0;
             if (string.IsNullOrEmpty( textBox1.Text))
             {
                 errobox("Por favor preencha alguma mensagem no campo de broadcast");
-                button3.Enabled = true;
+                button3.Enabled = true; button4.Enabled= true;
                 return;
             }
             List<string> paginastowork = new List<string>();
@@ -181,7 +201,7 @@ namespace ManyChat_Boot
             if (paginastowork.Count == 0)
             {
                 errobox("Por favor selecione ao menos uma página");
-                button3.Enabled = true;
+                button3.Enabled = true; button4.Enabled= true;
                 return;
             }
             driver.Navigate().GoToUrl("https://manychat.com/profile/dashboard");
@@ -191,7 +211,7 @@ namespace ManyChat_Boot
             if (linhas.Count == 0)
             {
                 errobox("Essa conta não possui paginas ");
-                button3.Enabled = true;
+                button3.Enabled = true; button4.Enabled= true;
                 return;
             }
             for(int j=0;j<paginastowork.Count;j++)
@@ -213,11 +233,13 @@ namespace ManyChat_Boot
                             driver.Navigate().GoToUrl(driver.Url.Replace("dashboard", "posting"));
                             await Task.Delay(1000);
                             driver.FindElement(By.Id("broadcast-new-btn")).Click();
-                            await Task.Delay(2000);
+                            await Task.Delay(5000);
                             if (textBox1.Text.Contains("[nome]"))
                             {
                                 var texts = textBox1.Text.Split(new string[] { "[nome]" }, StringSplitOptions.None);
-                                driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(texts[0]);
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), texts[0]);
+
+                                //driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(texts[0]);
                                 driver.FindElements(By.ClassName("oNEDujgXftj5JQaAcw3dz"))[1].Click();
                                 await Task.Delay(1000);
                                 driver.FindElement(By.ClassName("_3MQRFVhIng49OXcYE8n0Zh")).Click();
@@ -226,25 +248,40 @@ namespace ManyChat_Boot
                                 driver.SwitchTo().ActiveElement().SendKeys(OpenQA.Selenium.Keys.Enter);
                                 //driver.FindElement(By.TagName("body")).Click();
                                 await Task.Delay(1000);
-                                driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(texts[1]);
+                                driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(" ");
+                                await Task.Delay(400);
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), texts[1]);
+                               // driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(texts[1]);
                                 driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).Click();
 
 
                             }
                             else
-                                driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(textBox1.Text);
 
+                            {
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), textBox1.Text);
+
+                               
+                                //.SendKeys(textBox1.Text);
+
+                                //errobox("jdjsadjsa");
+
+                            }
                             await Task.Delay(1000);
                             if (usabt.Checked)
                             {
                                 await Task.Delay(1000);
                                 driver.FindElement(By.ClassName("_3TfGXj_Jjsn7ufMd9i-csU")).Click();
                                 await Task.Delay(1000);
-                                driver.FindElement(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb")).FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(buttontext.Text);
+                                //driver.FindElement(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb")).FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(buttontext.Text);
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb")).FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), buttontext.Text);
+
                                 await Task.Delay(200);
                                 driver.FindElement(By.ClassName("i-Builder-URL")).Click();
                                 await Task.Delay(600);
-                                driver.FindElements(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb"))[1].FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(btlink.Text);
+                                //driver.FindElements(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb"))[1].FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(btlink.Text);
+                                sendwithemojiAsync(driver.FindElements(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb"))[1].FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), btlink.Text);
+
                                 await Task.Delay(1000);
                                 driver.FindElement(By.ClassName("zOrnvIvPWd0MSmO4ZrEOL")).Click();
                             }
@@ -275,7 +312,7 @@ namespace ManyChat_Boot
                 await Task.Delay(4000);
             }
             status = "Configuração de broadcast finalizada com " + sucess + " Sucessos";
-            button3.Enabled = true;
+            button3.Enabled = true; button4.Enabled= true;
             
         }
 
@@ -287,6 +324,199 @@ namespace ManyChat_Boot
         private void timer1_Tick(object sender, EventArgs e)
         {
             statuslabel.Text = "Status: " + status;
+        }
+
+        async void sendwithemojiAsync(IWebElement elemnt,string text)
+        {
+
+            elemnt.SendKeys(OpenQA.Selenium.Keys.Space);
+             //elemnt.Click();
+            if(text.Contains("<br>"))
+            {
+                var splited = text.Split(new string[] { "<br>" }, StringSplitOptions.None);
+                foreach(string s in splited)
+                {
+                    SendKeys.Send(s);
+                    elemnt.SendKeys(Environment.NewLine);
+                }
+            }else
+            SendKeys.Send(text);
+            await Task.Delay(500);
+        }
+
+        private async void button4_ClickAsync(object sender, EventArgs e)
+        {
+            status = "Iniciando Default Reply";
+            button3.Enabled = false; button4.Enabled = false;
+            int sucess = 0;
+            if (string.IsNullOrEmpty(textBox1.Text))
+            {
+                errobox("Por favor preencha alguma mensagem no campo de Default Reply");
+                button3.Enabled = true; button4.Enabled = true;
+                return;
+            }
+            List<string> paginastowork = new List<string>();
+
+            foreach (CheckBox ck in paginas.Controls)
+            {
+
+                if (ck.Checked) paginastowork.Add(ck.Text);
+            }
+            if (paginastowork.Count == 0)
+            {
+                errobox("Por favor selecione ao menos uma página");
+                button3.Enabled = true; button4.Enabled = true;
+                return;
+            }
+            driver.Navigate().GoToUrl("https://manychat.com/profile/dashboard");
+            await Task.Delay(2000);
+
+            var linhas = driver.FindElement(By.TagName("tbody")).FindElements(By.TagName("tr"));
+            if (linhas.Count == 0)
+            {
+                errobox("Essa conta não possui paginas ");
+                button3.Enabled = true; button4.Enabled = true;
+                return;
+            }
+            for (int j = 0; j < paginastowork.Count; j++)
+            {
+
+                linhas = driver.FindElement(By.TagName("tbody")).FindElements(By.TagName("tr"));
+
+                for (int i = 0; i < linhas.Count; i++)
+                {
+                    status = "Configurando Default Reply " + j + "/" + paginastowork.Count;
+
+                    var tds = linhas[i].FindElements(By.TagName("td"));
+                    if (tds.Count == 5)
+                    {
+                        if (paginastowork[j] == (tds[0].Text))
+                        {
+                            tds[0].Click();
+                            await Task.Delay(2000);
+                            driver.Navigate().GoToUrl(driver.Url.Replace("dashboard", "automation/default/edit"));
+                            await Task.Delay(2000);
+                            //driver.FindElement(By.Id("broadcast-new-btn")).Click();
+                            //await Task.Delay(2000);
+
+                            /* driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(OpenQA.Selenium.Keys.Control+ "A");
+                             driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(OpenQA.Selenium.Keys.Backspace);
+                             */
+                            try
+                            {
+                                driver.FindElement(By.ClassName("_3fi7eNi-OjLJ4cz56PDxkj")).Click();
+                                await Task.Delay(500);
+                                driver.FindElement(By.ClassName("_1d8udd8wg72QrVzxpbqVLV")).Click();
+                                await Task.Delay(300);
+                            }
+                            catch
+                            {
+
+                            }
+                            await Task.Delay(2000);
+                            driver.FindElement(By.ClassName("i-Text")).Click();
+
+
+                            if (textBox1.Text.Contains("[nome]"))
+                            {
+                                var texts = textBox1.Text.Split(new string[] { "[nome]" }, StringSplitOptions.None);
+
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), texts[0]);
+                                //driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(texts[0]);
+                                await Task.Delay(2000);
+                                driver.FindElements(By.ClassName("oNEDujgXftj5JQaAcw3dz"))[1].Click();
+                                await Task.Delay(1000);
+                                driver.FindElement(By.ClassName("_3MQRFVhIng49OXcYE8n0Zh")).Click();
+                                driver.SwitchTo().ActiveElement().SendKeys(OpenQA.Selenium.Keys.Enter);
+                                await Task.Delay(500);
+                                driver.SwitchTo().ActiveElement().SendKeys(OpenQA.Selenium.Keys.Enter);
+                                //driver.FindElement(By.TagName("body")).Click();
+
+                                await Task.Delay(1000);
+                                driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(" ");
+                                await Task.Delay(400);
+
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), texts[1]);
+
+                                //driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(texts[1]);
+                                // driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).Click();
+
+
+                            }
+                            else
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), textBox1.Text);
+
+                            //driver.FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(textBox1.Text);
+
+
+
+                            await Task.Delay(2000);
+                           // errobox("eorooer");
+                            
+                            if (usabt.Checked)
+                            {
+                                await Task.Delay(3000);
+                                driver.FindElement(By.ClassName("_3TfGXj_Jjsn7ufMd9i-csU")).Click();
+                                await Task.Delay(1000);
+                                //driver.FindElement(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb")).FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(buttontext.Text);
+                                sendwithemojiAsync(driver.FindElement(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb")).FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), buttontext.Text);
+                                await Task.Delay(200);
+                                driver.FindElement(By.ClassName("i-Builder-URL")).Click();
+                                await Task.Delay(600);
+                                sendwithemojiAsync(driver.FindElements(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb"))[1].FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")), btlink.Text);
+                                //driver.FindElements(By.ClassName("_1ja2CXAOr_MjmGYkvZN_mb"))[1].FindElement(By.ClassName("_2WwE44lGQuscM1N3FqClhO")).SendKeys(btlink.Text);
+                                await Task.Delay(1000);
+                                driver.FindElement(By.ClassName("zOrnvIvPWd0MSmO4ZrEOL")).Click();
+                            }
+                            ((IJavaScriptExecutor)driver).ExecuteScript("document.getElementById('dr-enabled-toggle').checked=document.getElementById('dr-enabled-toggle').checked?true:true;document.getElementsByClassName('_3Arx-EN9DiACIX6a6QHjO0')[2].click();");
+                            await Task.Delay(5000);
+
+                            // driver.FindElement(By.ClassName("_13Arx-EN9DiACIX6a6QHjO0")).Click();
+
+                            /*
+
+                            driver.FindElement(By.Id("broadcast-go-next-btn")).Click();
+                            await Task.Delay(2000);
+                            if (agendadobox.Checked)
+                            {
+                                // driver.FindElement(By.XPath("//*[@data-test-id='postingSettings-scheduleBroadcast-radio ']")).Click();
+                                driver.FindElements(By.Name("type"))[1].Click();
+                                await Task.Delay(500);
+                                driver.FindElements(By.ClassName("_src_components_forms_TextInput_TextInput_module__input"))[1].SendKeys(dateTimePicker1.Value.ToString(dateTimePicker1.CustomFormat));
+
+                            }
+                            driver.FindElement(By.Id("broadcast-publish-btn")).Click();
+                            await Task.Delay(2000);
+                            if (driver.FindElements(By.ClassName("i-check")).Count > 0)
+                            {
+                                sucess++;
+                            }*/
+                            sucess++;
+                            break;
+                        }
+                    }
+                    else continue;
+
+                }
+                driver.Navigate().GoToUrl("https://manychat.com/profile/dashboard");
+                await Task.Delay(4000);
+            }
+            status = "Configuração de Default Reply finalizada com " + sucess + " Sucessos";
+            button3.Enabled = true; button4.Enabled = true;
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            foreach (CheckBox ck in paginas.Controls)
+            {
+                ck.Checked = true;
+            }
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
